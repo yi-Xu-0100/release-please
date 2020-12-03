@@ -726,7 +726,7 @@ export class GitHub {
       }/${this.repo}/pull/${pr}`,
       CheckpointType.Success
     );
-    return this.request(
+    await this.request(
       `POST /repos/:owner/:repo/issues/:issue_number/labels${
         this.proxyKey ? `?key=${this.proxyKey}` : ''
       }`,
