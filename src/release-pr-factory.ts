@@ -64,4 +64,14 @@ export class ReleasePRFactory {
         throw Error('unknown release type');
     }
   }
+  static releaseTypeToClass(releaseType: string): typeof ReleasePR | undefined {
+    switch (releaseType) {
+      case 'go':
+        return GoYoshi;
+      case 'go-yoshi':
+        return GoYoshi;
+      default:
+        return undefined;
+    }
+  }
 }

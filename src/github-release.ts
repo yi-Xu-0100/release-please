@@ -119,10 +119,15 @@ export class GitHubRelease {
         this.releaseType
       ).lookupPackageName(this.gh);
     }
-    // Go uses '/' for a tag separator, rather than '-':
+    // Go uses '/' for a tag separator, rather than '-', if a release type
+    // is provided, allow other languages to specify alternate tagging rules:
+    // TODO(bcoe): refactor class to work in action, perhaps drop
+    // releaseTypeToClass:
     let tagSeparator = '-';
     if (this.releaseType) {
-      tagSeparator = ReleasePRFactory.class(this.releaseType).tagSeparator();
+      tagSeparator =
+        ReleasePRFactory.releaseTypeToClass(this.releaseType)?.tagSeparator() ||
+        '-';
     }
     if (this.packageName === undefined) {
       throw Error(
