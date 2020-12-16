@@ -59,6 +59,7 @@ import chalk = require('chalk');
 import * as semver from 'semver';
 
 import {checkpoint, CheckpointType} from './util/checkpoint';
+import {packageBranch} from './util/package-branch';
 import {
   Commit,
   CommitsResponse,
@@ -594,7 +595,7 @@ export class GitHub {
         // it's easiest/safest to just pull this out by string search.
         const version = match[2];
         if (!version) continue;
-        if (prefix && match[1] !== prefix) {
+        if (prefix && match[1] !== packageBranch(prefix)) {
           continue;
         } else if (!prefix && match[1]) {
           continue;

@@ -125,11 +125,14 @@ export class Node extends ReleasePR {
   // A releaser can implement this method to automatically detect
   // the release name when creating a GitHub release, for instance by returning
   // name in package.json, or setup.py.
-  static async lookupPackageName(gh: GitHub): Promise<string | undefined> {
+  static async lookupPackageName(
+    gh: GitHub,
+    path?: string
+  ): Promise<string | undefined> {
     // Make an effort to populate packageName from the contents of
     // the package.json, rather than forcing this to be set:
     const contents: GitHubFileContents = await gh.getFileContents(
-      'package.json'
+      this.addPathStatic('package.json', path)
     );
     const pkg = JSON.parse(contents.parsedContent);
     if (pkg.name) return pkg.name;
