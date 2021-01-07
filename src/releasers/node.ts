@@ -17,6 +17,7 @@ import {ReleasePR, ReleaseCandidate} from '../release-pr';
 import {ConventionalCommits} from '../conventional-commits';
 import {GitHub, GitHubTag, GitHubFileContents} from '../github';
 import {checkpoint, CheckpointType} from '../util/checkpoint';
+import {packageBranchPrefix} from '../util/package-branch-prefix';
 import {Update} from '../updaters/update';
 import {Commit} from '../graphql-to-commits';
 
@@ -30,7 +31,9 @@ export class Node extends ReleasePR {
   static releaserName = 'node';
   protected async _run(): Promise<number | undefined> {
     const latestTag: GitHubTag | undefined = await this.gh.latestTag(
-      this.monorepoTags ? `${this.packageName}-` : undefined
+      this.monorepoTags
+        ? `${packageBranchPrefix(this.packageName, 'node')}-`
+        : undefined
     );
     const commits: Commit[] = await this.commits({
       sha: latestTag ? latestTag.sha : undefined,

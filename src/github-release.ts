@@ -14,6 +14,7 @@
 
 import chalk = require('chalk');
 import {checkpoint, CheckpointType} from './util/checkpoint';
+import {packageBranchPrefix} from './util/package-branch-prefix';
 import {ReleasePRFactory} from './release-pr-factory';
 import {GitHub, OctokitAPIs} from './github';
 import {parse} from 'semver';
@@ -85,6 +86,11 @@ export class GitHubRelease {
         this.releaseType
       ).lookupPackageName(this.gh, this.path);
     }
+    if (this.packageName === undefined) {
+      throw Error(
+        `could not determine package name for release repo = ${this.repoUrl}`
+      );
+    }
 
     // In most configurations, createRelease() should be called close to when
     // a release PR is merged, e.g., a GitHub action that kicks off this
@@ -93,7 +99,9 @@ export class GitHubRelease {
     const gitHubReleasePR = await this.gh.findMergedReleasePR(
       this.labels,
       pageSize,
-      this.monorepoTags ? this.packageName : undefined
+      this.monorepoTags
+        ? packageBranchPrefix(this.packageName, this.releaseType)
+        : undefined
     );
     if (!gitHubReleasePR) {
       checkpoint('no recent release PRs found', CheckpointType.Failure);
@@ -123,11 +131,6 @@ export class GitHubRelease {
     let tagSeparator = '-';
     if (this.releaseType) {
       tagSeparator = ReleasePRFactory.class(this.releaseType).tagSeparator();
-    }
-    if (this.packageName === undefined) {
-      throw Error(
-        `could not determine package name for release repo = ${this.repoUrl}`
-      );
     }
 
     const release = await this.gh.createRelease(

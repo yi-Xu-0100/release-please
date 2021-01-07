@@ -23,7 +23,7 @@ type PullsListResponseItems = PromiseValue<
 import * as semver from 'semver';
 
 import {checkpoint, CheckpointType} from './util/checkpoint';
-import {packageBranch} from './util/package-branch';
+import {packageBranchPrefix} from './util/package-branch-prefix';
 import {ConventionalCommits} from './conventional-commits';
 import {GitHub, GitHubTag, OctokitAPIs} from './github';
 import {Commit} from './graphql-to-commits';
@@ -99,6 +99,7 @@ export class ReleasePR {
   snapshot?: boolean;
   lastPackageVersion?: string;
   changelogSections?: [];
+  releaseType: string;
 
   constructor(options: ReleasePROptions) {
     this.bumpMinorPreMajor = options.bumpMinorPreMajor || false;
@@ -124,6 +125,7 @@ export class ReleasePR {
     this.gh = this.gitHubInstance(options.octokitAPIs);
 
     this.changelogSections = options.changelogSections;
+    this.releaseType = options.releaseType;
   }
 
   async run(): Promise<number | undefined> {
@@ -278,8 +280,10 @@ export class ReleasePR {
     const updates = options.updates;
     const version = options.version;
     const includePackageName = options.includePackageName;
-    // Do not include npm style @org/ prefixes in the branch name:
-    const branchPrefix = packageBranch(this.packageName);
+    const branchPrefix = packageBranchPrefix(
+      this.packageName,
+      this.releaseType
+    );
     const title = includePackageName
       ? `chore: release ${this.packageName} ${version}`
       : `chore: release ${version}`;

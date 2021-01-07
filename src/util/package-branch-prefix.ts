@@ -13,8 +13,18 @@
 // limitations under the License.
 
 // map from a packageName to the prefix used in release branch creation.
-export function packageBranch(packageName: string) {
-  return packageName.match(/^@[\w-]+\//)
-    ? packageName.split('/')[1]
-    : packageName;
+export function packageBranchPrefix(packageName: string, releaseType?: string) {
+  let branchPrefix: string;
+  switch (releaseType) {
+    case 'node': {
+      branchPrefix = packageName.match(/^@[\w-]+\//)
+        ? packageName.split('/')[1]
+        : packageName;
+      break;
+    }
+    default: {
+      branchPrefix = packageName;
+    }
+  }
+  return branchPrefix;
 }
